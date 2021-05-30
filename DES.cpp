@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include <bits/stdc++.h>
+#include <sstream>
 using std::cout;
 using std::endl;
 using std::string;
@@ -254,13 +255,6 @@ int convertBinaryToDecimal(string binary)
 	}
 	return decimal;
 }
-string swap(string left, string right){
-	string tmp = left;
-	left += right;
-	right+=tmp;
-	left+=right;
-	return left;
-}
 string mix(string left, string right, string roundKey, int roundIxdex){
 
 	string right_expanded ="";
@@ -377,10 +371,39 @@ string DESdecrypt(string cipher, string primary_key){
 	return plaintext;
 }
 
+string reverseBinary(string plaintextDecrypted){
+	int pos;
+	for(int i=plaintextDecrypted.length(); i>-1; i--){
+		if((int)plaintextDecrypted[i] == 49){
+			pos = i;
+			break;
+		}
+	}
+	return plaintextDecrypted.substr(0, pos);
+}
+
+string convertBinToText(string BinarySequence){
+	string afterReverse = reverseBinary(BinarySequence);
+	int count = afterReverse.length()/8;
+	string text = "";
+	for(int i =0; i<count; i++){
+		string data = afterReverse.substr(i*8,7);
+		int charval=0;
+		for(int j = 6; j>-1 ; j--){
+			if((int)data[j] == 49){
+				charval += pow(2,j);
+			}
+		}
+		char character = (char)charval;
+		text += character;
+	}
+	return text;
+}
 
 int main() {
 	struct timespec start, end;
-	
+	cout<<"-------------------------Encrypt-------------------------"<<endl;
+
 	string str = "tu dep trai 2k";
 	string key = "1010101010111011000010010001100000100111001101101100110011011101";
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -392,23 +415,14 @@ int main() {
     time_taken = (end.tv_sec - start.tv_sec) * 1e9;
     time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
   
-    cout << "Time taken by program is : " << std::fixed << time_taken << std::setprecision(9);
+    cout << "Encryption time : " << std::fixed << time_taken << std::setprecision(9);
     cout << " sec" << endl;
-	cout<<"Plain text: "<<str<<endl;
+	cout<<"Plain text as binary: "<<getSequence(str)<<endl;
 	cout<<"Key: "<<key<<endl;
-	cout<<"Cipher text:"<<endl;
-	for(unsigned i=1;i<cipher.length()+1;i++){
-		cout<<cipher[i-1];
-		if(i%16==0) cout<<endl;
-	}
-	cout<<"-----------Decrypt--------------"<<endl;
-	cout<<"Plaintext: "<<endl;
-	string tmp=padString(getSequence(str));
-	for(unsigned i=1;i<tmp.length()+1;i++){
-		cout<<tmp[i-1];
-		if(i%16==0) cout<<endl;
-	}
-	cout<<"After reverse: "<<endl;
+	cout<<"Cipher text:"<<cipher<<endl;
+
+	cout<<"-------------------------Decrypt-------------------------"<<endl;
+	
 	int i = 15;
 	int j = 0;
 	while(i > j)
@@ -419,11 +433,15 @@ int main() {
 		i--;
 		j++;
 	}
+	clock_gettime(CLOCK_MONOTONIC, &start);
+    std::ios_base::sync_with_stdio(false);
 	string reverse = DESencrypt(cipher,key,1);
-	for(unsigned i=1;i<reverse.length()+1;i++){
-		cout<<reverse[i-1];
-		if(i%16==0) cout<<endl;
-	}
+	reverse = convertBinToText(reverse);
+    clock_gettime(CLOCK_MONOTONIC, &end);
 
+    time_taken = (end.tv_sec - start.tv_sec) * 1e9;
+    time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
+	cout << "Decryption time : " << std::fixed << time_taken << std::setprecision(9)<<endl;
+	cout<<"Plain text after decrypt and reverse to string: "<<reverse<<endl;
     return 0;
 }
