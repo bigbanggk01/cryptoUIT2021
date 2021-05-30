@@ -327,48 +327,55 @@ string roundPerform(string input, string roundKey, int roundIndex){
 	}
 }
 
-string DESencrypt(string input, string primary_key, int flag=0){
+string DES(string input, string primary_key, int flag=0){
+	string cipher ="";
 	if(flag == 0) 
 	{
 		generate_keys(primary_key);
 		input = padString(getSequence(input));
-	}
-	int blocks_count = input.length()/64;
-	string cipher ="";
-	int count = 0;
-	for(int i =0; i<blocks_count;i++){
-		string block = separateBlock(input,i);
-		block = initialPermutation(block);
-		for(int j =0; j<16; j++){
-			block = roundPerform(block,round_keys[j],j);
-		}
+		int blocks_count = input.length()/64;
+		int count = 0;
+		for(int i =0; i<blocks_count;i++){
+			string block = separateBlock(input,i);
+			block = initialPermutation(block);
+			for(int j =0; j<16; j++){
+				block = roundPerform(block,round_keys[j],j);
+			}
 		
-		block = finalPermutation(block);
-		cipher += block;
-		if(block.length() == 64) count++;
+			block = finalPermutation(block);
+			cipher += block;
+			if(block.length() == 64) count++;
+		}
 	}
+	if(flag ==-1){
+		generate_keys(primary_key);
+		int i = 15;
+		int j = 0;
+		while(i > j)
+		{
+			string temp = round_keys[i];
+			round_keys[i] = round_keys[j];
+			round_keys[j] = temp;
+			i--;
+			j++;
+		}
+		int blocks_count = input.length()/64;
+		
+		int count = 0;
+		for(int i =0; i<blocks_count;i++){
+			string block = separateBlock(input,i);
+			block = initialPermutation(block);
+			for(int j =0; j<16; j++){
+				block = roundPerform(block,round_keys[j],j);
+			}
+		
+			block = finalPermutation(block);
+			cipher += block;
+			if(block.length() == 64) count++;
+		}
+	}
+	
 	return cipher; 
-}
-
-string DESdecrypt(string cipher, string primary_key){
-
-	generate_keys(primary_key);
-	int blocks_count = cipher.length()/64;
-	string plaintext ="";
-	int count = 0;
-	for(int blocks =0; blocks<blocks_count;blocks++){
-		string block = separateBlock(cipher,blocks);
-		block = initialPermutation(block);
-		for(int j=16 ; j>0; j--){
-			block = roundPerform(block,round_keys[j],j);
-		}
-		
-		block = finalPermutation(block);
-		plaintext += block;
-		if(block.length() == 64) count++;
-	}
-
-	return plaintext;
 }
 
 string reverseBinary(string plaintextDecrypted){
@@ -404,11 +411,11 @@ int main() {
 	struct timespec start, end;
 	cout<<"-------------------------Encrypt-------------------------"<<endl;
 
-	string str = "tu dep trai 2k";
+	string str = "best of C++ programming";
 	string key = "1010101010111011000010010001100000100111001101101100110011011101";
     clock_gettime(CLOCK_MONOTONIC, &start);
     std::ios_base::sync_with_stdio(false);
-	string cipher = DESencrypt(str,key);
+	string cipher = DES(str,key);
     clock_gettime(CLOCK_MONOTONIC, &end);
 	
     double time_taken;
@@ -423,19 +430,10 @@ int main() {
 
 	cout<<"-------------------------Decrypt-------------------------"<<endl;
 	
-	int i = 15;
-	int j = 0;
-	while(i > j)
-	{
-		string temp = round_keys[i];
-		round_keys[i] = round_keys[j];
-		round_keys[j] = temp;
-		i--;
-		j++;
-	}
+	
 	clock_gettime(CLOCK_MONOTONIC, &start);
     std::ios_base::sync_with_stdio(false);
-	string reverse = DESencrypt(cipher,key,1);
+	string reverse = DES(cipher,key,-1);
 	reverse = convertBinToText(reverse);
     clock_gettime(CLOCK_MONOTONIC, &end);
 
