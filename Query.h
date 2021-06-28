@@ -6,5 +6,6 @@ using namespace std;
 
 void insertIncome(string content[5], string user, string pass);
 void insertEmployee(string content[5], string user, string pass);
-void insertKey(string staffid, string user, string pass);
+void insertKey(string staffid, string hkey, string hiv, MYSQL* conn);
+void LoadOne(string staffid, string user, string pass);
 void LoadData(string user, string pass);

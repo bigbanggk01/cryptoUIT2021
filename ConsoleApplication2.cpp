@@ -58,6 +58,10 @@ int main() {
 	cout << endl << StringToHex(hpriv);*/
 
 	//LoadData("root", "password");
-	insertKey("0","root", "password");
+	//insertKey("0","root", "password");
+
+	//string staff[5] = { "Do Truong An", "1", "123456789", "SAI GON", "Admin" };
+	//insertEmployee(staff, "root", "password");
+	LoadOne("1", "root", "password");
 	return 0;
 }

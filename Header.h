@@ -33,8 +33,9 @@ string AESdecrypt(string hcipher, string hkey, string hiv);
 string ByteEncodeToHex(SecByteBlock key);
 SecByteBlock HexDecodeToByte(string hinput);
 //void GenerateKey(string& hkey, string& hiv, string& keyfile, string& ivfile);
-void GenerateKey(string& keyfile, string& ivfile);
+void GenerateKey(string& hkey, string& hiv);
 void SaveHexAES(string hexkey, string hexiv, string& keyfile, string& ivfile);
+void LoadHexAES(string& hkey, string& hiv, string keyfile, string ivfile);
 string StringToHex(string input);
 string AESencrypt(string plaintext, string hkey, string hiv);
 string ECCEncrypt(string plaintext, ECIES<ECP>::Encryptor e);
@@ -49,7 +50,7 @@ void LoadPrivateKey(PrivateKey& key, string& file);
 void SavePublicKey(const PublicKey& key, string& file);
 void SavePrivateKey(const PrivateKey& key, string& file);
 
-void GenKeyECDSA(string& hpriv, string& hpub);
+void GenKeyECDSA(ECDSA<ECP, SHA512>::PrivateKey& privateKey, ECDSA<ECP, SHA512>::PublicKey& publicKey);
 string ECDSASign(string mess, ECDSA<ECP, SHA512>::PrivateKey privateKey);
 bool ECDSAVerify(string mess, string signature, ECDSA<ECP, SHA512>::PublicKey publicKey);
 //MySQL
