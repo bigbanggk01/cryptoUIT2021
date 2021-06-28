@@ -4,5 +4,7 @@
 #include <stdlib.h>
 using namespace std;
 
-void insertEmployee(string content[3]);
-void insertKey(string key);
+void insertIncome(string content[5], string user, string pass);
+void insertEmployee(string content[5], string user, string pass);
+void insertKey(string staffid, string user, string pass);
+void LoadData(string user, string pass);

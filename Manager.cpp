@@ -13,7 +13,7 @@ SecByteBlock HexDecodeToByte(string hinput) {
     return key;
 }
 
-void GenerateKey(string& hkey, string& hiv) {
+void GenerateKey(string &keyfile, string &ivfile) {
     AutoSeededRandomPool prng;
     SecByteBlock key(AES::MAX_KEYLENGTH);
     SecByteBlock iv(AES::BLOCKSIZE);
@@ -21,8 +21,12 @@ void GenerateKey(string& hkey, string& hiv) {
     prng.GenerateBlock(key, key.size());
     prng.GenerateBlock(iv, iv.size());
 
+    string hkey;
+    string hiv;
     hkey = ByteEncodeToHex(key);
     hiv = ByteEncodeToHex(iv);
+
+    SaveHexAES(hkey, hiv, keyfile, ivfile);
 }
 string StringToHex(string input) {
     string output;
@@ -82,23 +86,38 @@ string AESdecrypt(string hcipher, string hkey, string hiv) {
     return recovered;
 }
 
-void SavePrivateKey(const PrivateKey& key, string& str)
-{
-    StringSink sink(str);
-    key.Save(sink);
-    string buffer;
-    StringSource s(str, true, new HexEncoder(new StringSink(buffer)));
-    str = buffer;
+void SaveHexAES(string hexkey, string hexiv, string &keyfile, string& ivfile) {
+    StringSource s(hexkey, true, new FileSink(keyfile.c_str()));
+    StringSource s1(hexiv, true, new FileSink(ivfile.c_str()));
+
 }
 
 
-void SavePublicKey(const PublicKey& key,  string& str)
+void SavePrivateKey(const PrivateKey& key, string& file)
 {
+    string str;
     StringSink sink(str);
+    key.Save(sink);
+    StringSource s(str, true, new HexEncoder(new FileSink(file.c_str())));
+
+    //string buffer;
+    //StringSource s(str, true, new HexEncoder(new StringSink(buffer)));
+    //str = buffer;
+    //StringSource s1(str, true, new FileSink(str));
+}
+
+
+void SavePublicKey(const PublicKey& key,  string& file)
+{
+    string str;
+    StringSink sink(str);
+    key.Save(sink);
+    StringSource s(str, true, new HexEncoder(new FileSink(file.c_str())));
+    /*StringSink sink(str);
     key.Save(sink);
     string buffer;
     StringSource s(str, true, new HexEncoder(new StringSink(buffer)));
-    str = buffer;
+    str = buffer;*/
 }
 
 void LoadPublicKey(PublicKey& key, string& str)
@@ -143,3 +162,36 @@ string ECCDecrypt(string cipher, ECIES<ECP>::Decryptor d) {
     return recovered;
 }
 
+void GenKeyECDSA(string& privfile, string& pubfile) {
+    AutoSeededRandomPool prng;
+    ECDSA<ECP, SHA512>::PrivateKey privateKey;
+    ECDSA<ECP, SHA512>::PublicKey publicKey;
+    privateKey.Initialize(prng, ASN1::secp256k1());
+    privateKey.MakePublicKey(publicKey);
+    SavePrivateKey(privateKey, privfile);
+    SavePublicKey(publicKey,pubfile);
+}
+
+string ECDSASign(string mess,ECDSA<ECP, SHA256>::PrivateKey privateKey) {
+    string signature;
+    signature.erase();
+    AutoSeededRandomPool prng;
+    StringSource s(mess, true,
+        new SignerFilter(prng,
+            ECDSA<ECP, SHA512>::Signer(privateKey),
+            new StringSink(signature)
+        )
+    );
+    return signature;
+}
+
+bool ECDSAVerify(string mess, string signature, ECDSA<ECP, SHA256>::PublicKey publicKey) {
+    bool result = false;
+    StringSource s(signature + mess, true,
+        new SignatureVerificationFilter(
+            ECDSA<ECP, SHA512>::Verifier(publicKey),
+            new ArraySink((CryptoPP::byte*)&result, sizeof(result))
+        )
+    );
+    return result;
+}
