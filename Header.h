@@ -50,8 +50,12 @@ void LoadPrivateKey(PrivateKey& key, string& file);
 void SavePublicKey(const PublicKey& key, string& file);
 void SavePrivateKey(const PrivateKey& key, string& file);
 
-void GenKeyECDSA(ECDSA<ECP, SHA512>::PrivateKey& privateKey, ECDSA<ECP, SHA512>::PublicKey& publicKey);
-string ECDSASign(string mess, ECDSA<ECP, SHA512>::PrivateKey privateKey);
-bool ECDSAVerify(string mess, string signature, ECDSA<ECP, SHA512>::PublicKey publicKey);
+void GenKeyECDSA(string& hprivateKey, string& hpublicKey);
+string ECDSASign(string mess, string hprivateKey);
+bool ECDSAVerify(string mess, string signature, string hpublicKey);
+void SaveSignature(string signature, string file);
+void SaveEDCSA(string hprivate, string hpublic, string privfile, string pubfile);
+void LoadEDCSA(string& hprivate, string& hpublic, string privfile, string pubfile);
+string LoadSignature(string file);
 //MySQL
 MYSQL Connect();

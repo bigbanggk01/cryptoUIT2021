@@ -24,44 +24,30 @@ int main() {
 		}
 		Sleep(200);
 	}*/
-	/*string employee[3] = {"Do Truong An","1587469422","SAI GON"};
-	string haes;
-	string hiv;
-	GenerateKey(haes, hiv);
-	string buff = AESencrypt(employee[1], haes, hiv);
-	employee[1] = buff;
-	insertEmployee(employee);
-	insertKey(haes, hiv);*/
-	//string staff[5] = { "Do Truong An", "1", "123456789", "SAI GON", "Admin" };
-	//insertEmployee(staff,"root", "password");
-	//string income[5] = { "0","123123","123123","110000","12321323" };
-	//insertIncome(income,"root", "password");
-
-
-	/*string hpriv;
-	string hpub;
-	GenKeyECDSA(hpriv,hpub);
-
-	ECDSA<ECP, SHA512>::PrivateKey privateKey;
-	ECDSA<ECP, SHA512>::PublicKey publicKey;
-
-	LoadPrivateKey(privateKey, hpriv);
-	LoadPublicKey(publicKey, hpub);
-
-	string mess = "abbbbbbbbbbcccccccddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
-	string signal = ECDSASign(mess, privateKey);
-	string fmess = "abbbbbbbbbbcccccccdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddde";
-
-	bool result = ECDSAVerify(mess, signal, publicKey);
-	cout << result;
-	cout << endl << StringToHex(signal);
-	cout << endl << StringToHex(hpriv);*/
-
+	
+	/*string staff1[5] = { "Tham Thach Tu","1","213456","Dong Nai","director" };
+	insertEmployee(staff1, "root", "password");
+	string staff2[5] = { "Do Truong An","1","2132132131","Sai GON","admin" };
+	insertEmployee(staff2, "root", "password");
+	string staff3[5] = { "To Thi My Au","0","0113188348","Da Nang","director" };
+	insertEmployee(staff3, "root", "password");*/
 	//LoadData("root", "password");
-	//insertKey("0","root", "password");
-
-	//string staff[5] = { "Do Truong An", "1", "123456789", "SAI GON", "Admin" };
-	//insertEmployee(staff, "root", "password");
-	LoadOne("1", "root", "password");
+	//LoadOne("6","root","password");
+	/*MYSQL* conn;
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	string host = "localhost";
+	string db = "employees";
+	string pass = "password";
+	string user = "root";
+	conn = mysql_init(0);
+	conn = mysql_real_connect(conn, host.c_str(), user.c_str(), pass.c_str(), db.c_str(), 3306, NULL, 0);*/
+	//signRow("6",conn);
+	/*string h = "123", h1 = "456";
+	GenKeyECDSA(h, h1);
+	string mess = "asssssasdassaas";
+	string sig = ECDSASign(mess, "123");
+	cout<<ECDSAVerify(mess, sig, h1);*/
+	LoadData("root", "password");
 	return 0;
 }

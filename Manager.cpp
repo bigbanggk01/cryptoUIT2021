@@ -106,7 +106,7 @@ void SavePrivateKey(const PrivateKey& key, string& file)
 }
 
 
-void SavePublicKey(const PublicKey& key,  string& file)
+void SavePublicKey(const PublicKey& key, string& file)
 {
     string str;
     StringSink sink(str);
@@ -161,15 +161,29 @@ string ECCDecrypt(string cipher, ECIES<ECP>::Decryptor d) {
     return recovered;
 }
 
-void GenKeyECDSA(ECDSA<ECP, SHA512>::PrivateKey &privateKey, ECDSA<ECP, SHA512>::PublicKey &publicKey) {
+void GenKeyECDSA(string& privfile, string& pubfile) {
     AutoSeededRandomPool prng;
+    ECDSA<ECP, SHA512>::PrivateKey privateKey;
+    ECDSA<ECP, SHA512>::PublicKey publicKey;
     privateKey.Initialize(prng, ASN1::secp256k1());
     privateKey.MakePublicKey(publicKey);
-    //SavePrivateKey(privateKey, privfile);
-    //SavePublicKey(publicKey,pubfile);
+    
+    FileSink fs(privfile.c_str());
+    privateKey.Save(fs);
+
+    FileSink fs2(pubfile.c_str());
+    publicKey.Save(fs2);
 }
 
-string ECDSASign(string mess,ECDSA<ECP, SHA256>::PrivateKey privateKey) {
+void SaveSignature(string signature, string file) {
+    StringSource s(signature, true, new FileSink(file.c_str()));
+}
+
+string ECDSASign(string mess,string file) {
+    ECDSA<ECP, SHA512>::PrivateKey privateKey;
+    FileSource fs(file.c_str(), true);
+    privateKey.Load(fs);
+
     string signature;
     signature.erase();
     AutoSeededRandomPool prng;
@@ -182,7 +196,10 @@ string ECDSASign(string mess,ECDSA<ECP, SHA256>::PrivateKey privateKey) {
     return signature;
 }
 
-bool ECDSAVerify(string mess, string signature, ECDSA<ECP, SHA256>::PublicKey publicKey) {
+bool ECDSAVerify(string mess, string signature, string fpublicKey) {
+    ECDSA<ECP, SHA512>::PublicKey publicKey;
+    FileSource fs(fpublicKey.c_str(), true);
+    publicKey.Load(fs);
     bool result = false;
     StringSource s(signature + mess, true,
         new SignatureVerificationFilter(
@@ -191,4 +208,20 @@ bool ECDSAVerify(string mess, string signature, ECDSA<ECP, SHA256>::PublicKey pu
         )
     );
     return result;
+}
+
+void SaveEDCSA(string hprivate, string hpublic , string privfile, string pubfile) {
+    StringSource s(hprivate, true, new FileSink(privfile.c_str()));
+    StringSource s1(hpublic, true, new FileSink(pubfile.c_str()));
+}
+
+void LoadEDCSA(string& hprivate, string& hpublic, string privfile, string pubfile) {
+    FileSource s(privfile.c_str(), true, new StringSink(hprivate));
+    FileSource s1(pubfile.c_str(), true, new StringSink(hpublic));
+}
+
+string LoadSignature(string file) {
+    string sig;
+    FileSource f(file.c_str(), true, new StringSink(sig));
+    return sig;
 }
