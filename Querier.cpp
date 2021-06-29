@@ -31,13 +31,19 @@ void insertEmployee(string content[5],string user, string pass) {
 	}
 	int qstate = 0;
 	string lastid;
-	string query = "SELECT COUNT(*) FROM employeeinfo";
+	string query = "SELECT MAX(CAST(id AS UNSIGNED)) FROM employeeinfo";
 	qstate = mysql_query(conn, query.c_str());
 	res = mysql_store_result(conn);
 	while (row = mysql_fetch_row(res)) {
 		lastid = (string)row[0]++;
 	}
 	
+	stringstream convert(lastid);
+	int index = 0;
+	convert >> index;
+	index++;
+	lastid = std::to_string(index);
+
 	string query1 = "insert into employeeinfo(id, name,sex) values('"+lastid+"', '"+content[0]+"', '"+content[1]+"')";
 	string query2 = "UPDATE employeeinfo SET `phone` = '"+content[2]+"', `address` = '"+content[3]+"', `position` = '"+content[4]+"' WHERE `id` = '"+lastid+"';";
 	qstate = mysql_query(conn, query1.c_str());
@@ -74,6 +80,51 @@ void insertEmployee(string content[5],string user, string pass) {
 //	qstate = mysql_query(conn, query2.c_str());
 //
 //}
+
+
+bool deleteEmployee(string staffid, string user, string pass) {
+	MYSQL* conn;
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	string host = "localhost";
+	string db = "employees";
+	conn = mysql_init(0);
+	conn = mysql_real_connect(conn, host.c_str(), user.c_str(), pass.c_str(), db.c_str(), 3306, NULL, 0);
+	if (conn) {
+	}
+	else {
+		exit(0);
+	}
+	int qstate = 0;
+	string lastid;
+	string query = "SELECT * FROM employeeinfo WHERE id='"+staffid+"'";
+	qstate = mysql_query(conn, query.c_str());
+	res = mysql_store_result(conn);
+	while (row = mysql_fetch_row(res)) {
+		if (row[0] == NULL) {
+			
+			return false;
+		}
+		else {
+			string query1 = "DELETE FROM employeeinfo WHERE id = '"+staffid+"'";
+			qstate = mysql_query(conn, query1.c_str());
+			
+			string aesk = "aeskey" + staffid;
+			string aesiv = "aesiv" + staffid;
+			string eccpriv = "eccprivatekey" + staffid;
+			string eccpub = "eccpublickey" + staffid;
+			string eccsig = "eccsignature" + staffid;
+
+			remove(aesk.c_str());
+			remove(aesiv.c_str());
+			remove(eccpriv.c_str());
+			remove(eccpub.c_str());
+			remove(eccsig.c_str());
+			return true;
+		}
+	}
+
+}
 
 
 void saveKey(string staffid, string hkey, string hiv) {
@@ -151,6 +202,15 @@ void LoadData(string user, string pass) {
 	int index = 0;
 	convert >> index;
 
+	string* id = new string[index];
+	query = "SELECT id FROM employeeinfo";
+	qstate0 = mysql_query(conn, query.c_str());
+	res = mysql_store_result(conn);
+	int ix = 0;
+	while (row = mysql_fetch_row(res)) {
+		id[ix] = (string)row[0];
+		ix++;
+	}
 	system("cls");
 	std::printf("+%5s+%20s+%5s+%12s+%20s+%20s+", "-----", "--------------------", "-----", "------------", "--------------------", "--------------------");
 	std::cout << "\n";
@@ -159,12 +219,11 @@ void LoadData(string user, string pass) {
 	std::printf("+%5s+%20s+%5s+%12s+%20s+%20s+", "-----", "--------------------", "-----", "------------", "--------------------", "--------------------");
 	std::cout << "\n";
 	for (int i = 0; i < index; i++) {
-		string staffid = std::to_string(i);
 		int qstate = 0;
-		string queryemployee = "SELECT * FROM employeeinfo WHERE id ='" +staffid+"'";
+		string queryemployee = "SELECT * FROM employeeinfo WHERE id ='" +id[i]+"'";
 		string hkey, hiv;
-		string keyfile = "aeskey" + staffid;
-		string ivfile = "aesiv" + staffid;
+		string keyfile = "aeskey" + id[i];
+		string ivfile = "aesiv" + id[i];
 		LoadHexAES(hkey, hiv, keyfile, ivfile);
 
 		qstate = mysql_query(conn, queryemployee.c_str());
@@ -176,7 +235,7 @@ void LoadData(string user, string pass) {
 			for (int i = 0; i < 6; i++) {
 				content += (string)row[i];
 			}
-			if (!verifyRow(staffid, content)) {
+			if (!verifyRow(id[i], content)) {
 				std::cout << "Verify: NO OK AT " + (string)row[0] + "\n";
 				continue;
 			}

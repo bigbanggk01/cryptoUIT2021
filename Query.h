@@ -14,3 +14,4 @@ void LoadOne(string staffid, string user, string pass);
 void LoadData(string user, string pass);
 void signRow(string staffid, MYSQL* conn);
 bool verifyRow(string staffid, string content);
+bool deleteEmployee(string staffid, string user, string pass);

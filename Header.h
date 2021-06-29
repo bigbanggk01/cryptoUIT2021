@@ -32,6 +32,7 @@ int dataFrame(string user, string pass);
 int dataFrame1(string user, string pass);
 int insertFrame(string user, string password);
 void eraseLines(int count);
+int deleteFrame(string user, string pass);
 //Crypto header
 string AESencrypt(string plaintext, string hkey, string hiv);
 string AESdecrypt(string hcipher, string hkey, string hiv);

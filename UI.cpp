@@ -190,14 +190,14 @@ int aboutFrame() {
 int workFrame(string user, string pass) {
 	
 	int pointer = 0;
-	string options[6] = { "Load","Load one","Insert","Update","Delete","Exit" };
+	string options[5] = { "Load","Load one","Insert","Delete","Exit" };
 	while (true)
 	{
 		
 		system("cls");
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 		printASCII("myfile.txt");
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 5; i++) {
 			if (i == pointer) {
 				printSymbol(0);
 				cout << ">> " << options[i] << " <<";
@@ -215,14 +215,14 @@ int workFrame(string user, string pass) {
 			if (GetAsyncKeyState(VK_UP) & 0x8000) {
 				pointer -= 1;
 				if (pointer == -1) {
-					pointer = 5;
+					pointer = 4;
 				}
 				break;
 
 			}
 			else if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
 				pointer += 1;
-				if (pointer == 6) {
+				if (pointer == 5) {
 					pointer = 0;
 				}
 				break;
@@ -253,15 +253,12 @@ int workFrame(string user, string pass) {
 				break;
 				case 3:
 				{
-					cin.ignore();
+					cin.clear();
+					cin.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
+					return 7;
 				}
 				break;
-				case 4:
-				{
-					cin.ignore();
-					
-				}
-				case 5: {
+				case 4: {
 					exit(0);
 				}
 				break;
@@ -473,5 +470,35 @@ int insertFrame(string user, string password) {
 
 	insertEmployee(newstaff, user, password);
 	
+	return 2;
+}
+
+int deleteFrame(string user, string pass) {
+	system("cls");
+	printSymbol(1);
+	cout << "Enter to start.";
+	cin.clear();
+	cin.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
+	printSymbol(4);
+	
+	cout << "Delete: ";
+	string staffid;
+	getline(cin, staffid);
+	bool result = deleteEmployee(staffid, user, pass);
+
+	if (result == true) {
+		printSymbol(1);
+		cout << "Delete successfully.";
+		printSymbol(0);
+		cout << "Enter to back";
+		cin.ignore();
+	}
+	else {
+		printSymbol(3);
+		cout << "Delete unsuccessfully.";
+		printSymbol(0);
+		cout << "Enter to back";
+		cin.ignore();
+	}
 	return 2;
 }
