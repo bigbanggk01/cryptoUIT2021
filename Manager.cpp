@@ -76,8 +76,10 @@ string AESdecrypt(string hcipher, string hkey, string hiv) {
     }
     catch (const Exception& e)
     {
-        cerr << e.what() << endl;
-        exit(1);
+        /*cerr << e.what() << endl;
+        exit(1);*/
+        return "";
+
     }
     return recovered;
 }
@@ -156,8 +158,13 @@ string ECCEncrypt(string plaintext, ECIES<ECP>::Encryptor e) {
 string ECCDecrypt(string cipher, ECIES<ECP>::Decryptor d) {
     AutoSeededRandomPool prng;
     string recovered;
-    StringSource s(cipher, true, new PK_DecryptorFilter(prng, d, new StringSink(recovered)));
-
+    try {
+        StringSource s(cipher, true, new PK_DecryptorFilter(prng, d, new StringSink(recovered)));
+    }
+    catch (...) {
+        return "Data can't be decrypt.";
+    }
+    
     return recovered;
 }
 
@@ -201,12 +208,18 @@ bool ECDSAVerify(string mess, string signature, string fpublicKey) {
     FileSource fs(fpublicKey.c_str(), true);
     publicKey.Load(fs);
     bool result = false;
-    StringSource s(signature + mess, true,
-        new SignatureVerificationFilter(
-            ECDSA<ECP, SHA512>::Verifier(publicKey),
-            new ArraySink((CryptoPP::byte*)&result, sizeof(result))
-        )
-    );
+    try{
+        StringSource s(signature + mess, true,
+            new SignatureVerificationFilter(
+                ECDSA<ECP, SHA512>::Verifier(publicKey),
+                new ArraySink((CryptoPP::byte*)&result, sizeof(result))
+            )
+        );
+    }
+    catch (...) {
+        return false;
+    };
+    
     return result;
 }
 

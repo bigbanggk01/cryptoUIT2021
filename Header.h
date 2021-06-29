@@ -23,10 +23,15 @@ using namespace CryptoPP;
 //UI header
 void printASCII(string filename);
 void printSymbol(int type);
-int loginFrame();
+int mainFrame(string& user, string& pass);
+int loginFrame(string& user, string& pass);
 int aboutFrame();
-int workFrame();
-
+int workFrame(string user,string pass);
+bool checkConnect(string user, string pass);
+int dataFrame(string user, string pass);
+int dataFrame1(string user, string pass);
+int insertFrame(string user, string password);
+void eraseLines(int count);
 //Crypto header
 string AESencrypt(string plaintext, string hkey, string hiv);
 string AESdecrypt(string hcipher, string hkey, string hiv);

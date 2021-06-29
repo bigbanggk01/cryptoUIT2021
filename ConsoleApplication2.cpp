@@ -1,9 +1,10 @@
 #include "Header.h"
 #include "Query.h"
-
+string user;
+string pass;
 int main() {
 	int frame = 0;
-	/*while (true)
+	while (true)
 	{
 		switch (frame)
 		{
@@ -11,20 +12,32 @@ int main() {
 			return 0;
 		}break;
 		case 0: {
-			frame = loginFrame();
+			frame = mainFrame(user,pass);
 		}break;
 		case 1: {
 			frame = aboutFrame();
 		}break;
 		case 2: {
-			frame = workFrame();
+			frame = workFrame(user, pass);
+		}break;
+		case 3: {
+			frame = loginFrame(user,pass);
+		}break;
+		case 4: {
+			frame = dataFrame(user, pass);
+		}break;
+		case 5: {
+			frame = dataFrame1(user, pass);
+		}break;
+		case 6: {
+			frame = insertFrame(user, pass);
 		}break;
 		default:
 			break;
 		}
 		Sleep(200);
-	}*/
-	
+	}
+	//workFrame("a", "p");
 	/*string staff1[5] = { "Tham Thach Tu","1","213456","Dong Nai","director" };
 	insertEmployee(staff1, "root", "password");
 	string staff2[5] = { "Do Truong An","1","2132132131","Sai GON","admin" };
@@ -48,6 +61,10 @@ int main() {
 	string mess = "asssssasdassaas";
 	string sig = ECDSASign(mess, "123");
 	cout<<ECDSAVerify(mess, sig, h1);*/
-	LoadData("root", "password");
+	//LoadData("root", "password");
+	//string staff3[5] = { "To Thi My Au","0","0113188348","Da Nang","director" };
+	//insertEmployee(staff3, "root", "password");
+	//LoadData("root", "password");
+
 	return 0;
 }

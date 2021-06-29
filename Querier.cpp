@@ -123,7 +123,6 @@ bool verifyRow(string staffid, string content) {
 void LoadData(string user, string pass) {
 	MYSQL* conn;
 	MYSQL_ROW row;
-	MYSQL_ROW checkrow;
 	MYSQL_ROW rowkey;
 	MYSQL_RES* res;
 	MYSQL_RES* reskey;
@@ -163,23 +162,24 @@ void LoadData(string user, string pass) {
 		string staffid = std::to_string(i);
 		int qstate = 0;
 		string queryemployee = "SELECT * FROM employeeinfo WHERE id ='" +staffid+"'";
-		string querykey = "SELECT id FROM keycode WHERE staffid ='" + staffid+"'";
-		qstate = mysql_query(conn, querykey.c_str());
-		reskey = mysql_store_result(conn);
 		string hkey, hiv;
-		while (rowkey = mysql_fetch_row(reskey))
-		{
-			string keyfile = "aeskey" + (string)rowkey[0];
-			string ivfile = "aesiv" + (string)rowkey[0];
-			LoadHexAES(hkey, hiv, keyfile, ivfile);
-		}
+		string keyfile = "aeskey" + staffid;
+		string ivfile = "aesiv" + staffid;
+		LoadHexAES(hkey, hiv, keyfile, ivfile);
 
 		qstate = mysql_query(conn, queryemployee.c_str());
-
 
 		res = mysql_store_result(conn);
 		while (row = mysql_fetch_row(res)) {
 			string decrypted[6];
+			string content;
+			for (int i = 0; i < 6; i++) {
+				content += (string)row[i];
+			}
+			if (!verifyRow(staffid, content)) {
+				std::cout << "Verify: NO OK AT " + (string)row[0] + "\n";
+				continue;
+			}
 			for (int i = 0; i < 6; i++) {
 				if (i != 0 && i != 2) {
 					decrypted[i] = AESdecrypt((string)row[i], hkey, hiv);
@@ -190,17 +190,6 @@ void LoadData(string user, string pass) {
 			}
 			std::printf("|%-5s|%-20s|%-5s|%-12s|%-20s|%-20s|", decrypted[0].c_str(), decrypted[1].c_str(), decrypted[2].c_str(), decrypted[3].c_str(), decrypted[4].c_str(), decrypted[5].c_str());
 			std::cout << "\n";
-		}
-		int notOK;
-		while (checkrow = mysql_fetch_row(res)) {
-			string content;
-			for (int i = 0; i < 6; i++) {
-				content += (string)checkrow[i];
-			}
-			if (!verifyRow(staffid, content)) {
-				std::cout << "Verify: NO OK AT " + (string)checkrow[0] + "\n";
-				notOK = 1;
-			}
 		}
 	}
 	std::printf("+%5s+%20s+%5s+%12s+%20s+%20s+", "-----", "--------------------", "-----", "------------", "--------------------", "--------------------");
@@ -229,10 +218,10 @@ void LoadOne(string staffid,string user, string pass){
 	string ivfile = "aesiv" + staffid;
 	LoadHexAES(hkey, hiv, keyfile, ivfile);
 
-	qstate = mysql_query(conn, query.c_str());
+	
 
 
-	res = mysql_store_result(conn);
+	
 	system("cls");
 	std::printf("+%5s+%20s+%5s+%12s+%20s+%20s+", "-----", "--------------------", "-----", "------------", "--------------------", "--------------------");
 	std::cout << "\n";
@@ -241,7 +230,8 @@ void LoadOne(string staffid,string user, string pass){
 	std::printf("+%5s+%20s+%5s+%12s+%20s+%20s+", "-----", "--------------------", "-----", "------------", "--------------------", "--------------------");
 	std::cout << "\n";
 	string content;
-
+	qstate = mysql_query(conn, query.c_str());
+	res = mysql_store_result(conn);
 	while (row = mysql_fetch_row(res)) {
 		string decrypted[6];
 
@@ -266,4 +256,16 @@ void LoadOne(string staffid,string user, string pass){
 	std::printf("+%5s+%20s+%5s+%12s+%20s+%20s+", "-----", "--------------------", "-----", "------------", "--------------------", "--------------------");
 	std::cout << "\n";
 	
+}
+
+bool checkConnect(string user, string pass) {
+	MYSQL* conn;
+	string host = "localhost";
+	string db = "employees";
+	conn = mysql_init(0);
+	conn = mysql_real_connect(conn, host.c_str(), user.c_str(), pass.c_str(), db.c_str(), 3306, NULL, 0);
+	if (!conn) {
+		return false;
+	}
+	return true;
 }
