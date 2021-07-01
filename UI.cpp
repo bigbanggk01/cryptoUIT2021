@@ -6,11 +6,17 @@
 #include <ios>
 #undef max
 string symbol[] = { "[.] ","[+] ", "[-] ", "[!] ", "[?] " };
-#define KEY_UP 72
-#define KEY_DOWN 80
-#define KEY_LEFT 75
-#define KEY_RIGHT 77
-
+struct setcolor
+{
+	int color;
+	setcolor(int c) : color(c) {}
+	std::ostream& operator()(std::ostream& os)
+	{
+		HANDLE hcon = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hcon, color);
+		return os;
+	}
+};
 void printASCII(string filename) {
 	string line = "";
 	ifstream inFile;
@@ -58,8 +64,10 @@ int mainFrame(string& user, string& pass) {
 		printASCII("myfile.txt");
 		for (int i = 0; i < 3; i++) {
 			if (i == pointer) {
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 				printSymbol(0);
 				cout << ">> " << Menu[i] << " <<";
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 				cout << endl;
 			}
 			else {
@@ -134,8 +142,10 @@ int aboutFrame() {
 		printASCII("myfile.txt");
 		for (int i = 0; i < 2; i++) {
 			if (i == pointer) {
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 				printSymbol(0);
 				cout << ">> " << options[i] << " <<";
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 				cout << endl;
 			}
 			else {
@@ -190,17 +200,19 @@ int aboutFrame() {
 int workFrame(string user, string pass) {
 	
 	int pointer = 0;
-	string options[5] = { "Load","Load one","Insert","Delete","Exit" };
+	string options[6] = { "Load","Load one","Insert","Delete","Logout","Exit"};
 	while (true)
 	{
 		
 		system("cls");
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 		printASCII("myfile.txt");
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 6; i++) {
 			if (i == pointer) {
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 				printSymbol(0);
 				cout << ">> " << options[i] << " <<";
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 				cout << endl;
 			}
 			else {
@@ -215,14 +227,14 @@ int workFrame(string user, string pass) {
 			if (GetAsyncKeyState(VK_UP) & 0x8000) {
 				pointer -= 1;
 				if (pointer == -1) {
-					pointer = 4;
+					pointer = 5;
 				}
 				break;
 
 			}
 			else if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
 				pointer += 1;
-				if (pointer == 5) {
+				if (pointer == 6) {
 					pointer = 0;
 				}
 				break;
@@ -259,9 +271,14 @@ int workFrame(string user, string pass) {
 				}
 				break;
 				case 4: {
-					exit(0);
+					cin.clear();
+					cin.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
+					return 0;
 				}
 				break;
+				case 5: {
+					exit(0);
+				}
 				default:
 					break;
 				}
@@ -312,8 +329,10 @@ int dataFrame(string user, string pass) {
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 		for (int i = 0; i < 2; i++) {
 			if (i == pointer) {
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 				printSymbol(0);
 				cout << ">> " << options[i] << " <<";
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 				cout << endl;
 			}
 			else {
@@ -383,8 +402,10 @@ int dataFrame1(string user, string pass) {
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 		for (int i = 0; i < 2; i++) {
 			if (i == pointer) {
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 				printSymbol(0);
 				cout << ">> " << options[i] << " <<";
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 				cout << endl;
 			}
 			else {
@@ -488,14 +509,16 @@ int deleteFrame(string user, string pass) {
 
 	if (result == true) {
 		printSymbol(1);
-		cout << "Delete successfully.";
+		cout << "Delete successfully.\n";
 		printSymbol(0);
 		cout << "Enter to back";
 		cin.ignore();
 	}
 	else {
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 		printSymbol(3);
-		cout << "Delete unsuccessfully.";
+		cout << "Staff does not exsist.\n";
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 		printSymbol(0);
 		cout << "Enter to back";
 		cin.ignore();

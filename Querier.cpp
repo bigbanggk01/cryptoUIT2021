@@ -1,10 +1,7 @@
 #pragma once
 #include "Query.h"
 #include "Header.h"
-//string host = "localhost";
-//string user = "root";
-//string pass = "password";
-//string db = "testdb";
+
 #include <sstream>
 using namespace std;
 void insertEmployee(string content[5],string user, string pass) {
@@ -35,7 +32,12 @@ void insertEmployee(string content[5],string user, string pass) {
 	qstate = mysql_query(conn, query.c_str());
 	res = mysql_store_result(conn);
 	while (row = mysql_fetch_row(res)) {
-		lastid = (string)row[0]++;
+		if (row[0] == NULL) {
+			lastid = "-1";
+		}
+		else {
+			lastid = (string)row[0]++;
+		}
 	}
 	
 	stringstream convert(lastid);
@@ -276,10 +278,6 @@ void LoadOne(string staffid,string user, string pass){
 	string keyfile = "aeskey" + staffid;
 	string ivfile = "aesiv" + staffid;
 	LoadHexAES(hkey, hiv, keyfile, ivfile);
-
-	
-
-
 	
 	system("cls");
 	std::printf("+%5s+%20s+%5s+%12s+%20s+%20s+", "-----", "--------------------", "-----", "------------", "--------------------", "--------------------");
